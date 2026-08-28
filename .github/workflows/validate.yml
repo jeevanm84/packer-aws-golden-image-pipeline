@@ -1,0 +1,75 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  packer:
+    name: Packer and shell validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Packer
+        uses: hashicorp/setup-packer@v3.4.0
+        with:
+          version: 1.16.0
+
+      - name: Check Packer formatting
+        run: |
+          packer fmt -check -recursive beginner
+          packer fmt -check -recursive aws
+
+      - name: Initialize and validate Docker lab
+        run: |
+          packer init beginner/docker
+          packer validate beginner/docker
+
+      - name: Initialize and validate AWS lab
+        run: |
+          packer init aws
+          packer validate -var-file=aws/environments/learning.pkrvars.example.hcl aws
+
+      - name: Check shell syntax
+        run: |
+          for script in beginner/docker/scripts/*.sh aws/scripts/*.sh scripts/*.sh; do
+            bash -n "$script"
+          done
+
+  terraform:
+    name: Terraform validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.14.5
+
+      - name: Initialize without a backend
+        run: terraform init -backend=false
+        working-directory: terraform/example-instance
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive
+        working-directory: terraform/example-instance
+
+      - name: Validate configuration
+        run: terraform validate
+        working-directory: terraform/example-instance

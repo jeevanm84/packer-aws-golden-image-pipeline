@@ -1,0 +1,4 @@
+aws_region        = "ap-south-1"
+ami_id            = "ami-replace-me"
+subnet_id         = "subnet-replace-me"
+security_group_ids = ["sg-replace-me"]

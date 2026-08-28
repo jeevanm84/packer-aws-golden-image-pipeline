@@ -1,0 +1,16 @@
+.packer.d/
+packer_cache/
+*.pkrvars.hcl
+!*.pkrvars.example.hcl
+packer-manifest.json
+manifest.json
+*.pem
+*.key
+.env
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+.DS_Store
+.idea/
+.vscode/

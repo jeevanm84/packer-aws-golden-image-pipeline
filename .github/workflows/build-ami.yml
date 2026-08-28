@@ -1,0 +1,100 @@
+name: Build and verify AMI
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_smoke_test:
+        description: Launch a temporary EC2 instance and test nginx
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: aws-ami-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build AWS golden image
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: aws-build
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Packer
+        uses: hashicorp/setup-packer@v3.4.0
+        with:
+          version: 1.16.0
+
+      - name: Configure temporary AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: packer-${{ github.run_id }}
+          aws-region: ${{ vars.AWS_REGION }}
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+
+      - name: Confirm AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Restrict temporary SSH access to this runner
+        id: runner_network
+        run: |
+          runner_ip="$(curl -fsS https://checkip.amazonaws.com | tr -d '[:space:]')"
+          echo "cidr=$runner_ip/32" >> "$GITHUB_OUTPUT"
+
+      - name: Initialize and validate
+        run: |
+          packer fmt -check -recursive aws
+          packer init aws
+          packer validate \
+            -var "aws_region=${{ vars.AWS_REGION }}" \
+            -var "build_commit=${{ github.sha }}" \
+            -var "allowed_ssh_cidr=${{ steps.runner_network.outputs.cidr }}" \
+            aws
+
+      - name: Build AMI
+        run: |
+          packer build \
+            -color=false \
+            -on-error=cleanup \
+            -var "aws_region=${{ vars.AWS_REGION }}" \
+            -var "build_commit=${{ github.sha }}" \
+            -var "allowed_ssh_cidr=${{ steps.runner_network.outputs.cidr }}" \
+            aws
+
+      - name: Read AMI ID
+        id: image
+        run: |
+          ami_id="$(./scripts/get-ami-id.sh packer-manifest.json)"
+          echo "ami_id=$ami_id" >> "$GITHUB_OUTPUT"
+          echo "### AMI created: \`$ami_id\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build manifest
+        uses: actions/upload-artifact@v7
+        with:
+          name: packer-manifest-${{ github.run_id }}
+          path: packer-manifest.json
+          retention-days: 30
+
+      - name: Launch and smoke-test the AMI
+        if: ${{ inputs.run_smoke_test }}
+        env:
+          AMI_ID: ${{ steps.image.outputs.ami_id }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          SUBNET_ID: ${{ vars.AWS_TEST_SUBNET_ID }}
+          VPC_ID: ${{ vars.AWS_TEST_VPC_ID }}
+        run: ./scripts/verify-ami.sh
+
+      - name: Summarize cleanup command
+        env:
+          AMI_ID: ${{ steps.image.outputs.ami_id }}
+        run: |
+          echo "When finished, run the Cleanup AMI workflow for \`$AMI_ID\`." >> "$GITHUB_STEP_SUMMARY"

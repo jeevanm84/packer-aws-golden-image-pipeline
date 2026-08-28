@@ -1,0 +1,43 @@
+name: Cleanup AMI
+
+on:
+  workflow_dispatch:
+    inputs:
+      ami_id:
+        description: Exact learning AMI ID to deregister
+        required: true
+        type: string
+      confirmation:
+        description: Type DELETE to confirm AMI and snapshot removal
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  cleanup:
+    name: Deregister AMI and delete snapshots
+    if: ${{ inputs.confirmation == 'DELETE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: aws-build
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure temporary AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: cleanup-${{ github.run_id }}
+          aws-region: ${{ vars.AWS_REGION }}
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+
+      - name: Delete only project-tagged image resources
+        env:
+          AMI_ID: ${{ inputs.ami_id }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        run: ./scripts/cleanup-ami.sh

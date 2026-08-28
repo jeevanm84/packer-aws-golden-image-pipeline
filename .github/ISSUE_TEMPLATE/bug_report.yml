@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a reproducible problem in a learning path
+title: "[Bug]: "
+labels: [bug, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened and what did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: Learning track
+      options:
+        - Beginner Docker lab
+        - Intermediate local AWS build
+        - Advanced GitHub Actions pipeline
+        - Terraform consumer
+        - Cleanup
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Remove credentials, AWS account IDs, and private network identifiers.
+    validations:
+      required: true
+  - type: textarea
+    id: versions
+    attributes:
+      label: Tool versions and sanitized output
+      render: shell
+    validations:
+      required: true

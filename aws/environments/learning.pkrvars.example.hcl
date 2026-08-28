@@ -1,0 +1,5 @@
+aws_region       = "ap-south-1"
+ami_name_prefix  = "packer-learning"
+instance_type    = "t3.micro"
+allowed_ssh_cidr = "203.0.113.10/32"
+build_commit     = "local"

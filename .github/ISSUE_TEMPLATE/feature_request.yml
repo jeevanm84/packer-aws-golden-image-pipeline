@@ -1,0 +1,24 @@
+name: Learning improvement
+description: Propose a safer or clearer lab improvement
+title: "[Learning]: "
+labels: [enhancement, needs-triage]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Learning outcome
+      description: What should a learner be able to build or explain afterward?
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Cost, permissions, security, and cleanup considerations
+    validations:
+      required: true

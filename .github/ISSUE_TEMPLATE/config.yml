@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/jeevanm84/packer-aws-golden-image-pipeline/security/advisories/new
+    about: Never publish credentials or vulnerabilities in a public issue.
