@@ -26,7 +26,7 @@ The Docker path is self-contained and free of AWS. The AWS path is inaccessible 
 ## Template assembly
 
 ```mermaid
-flowchart LR
+flowchart TB
     Plugin[versions.pkr.hcl] --> Template[Packer template]
     Inputs[variables.pkr.hcl] --> Template
     Builder[sources.pkr.hcl] --> Template
@@ -42,7 +42,7 @@ Packer treats all `*.pkr.hcl` files in `aws/` as one configuration. The split do
 ## Local learning path
 
 ```mermaid
-flowchart LR
+flowchart TB
     H[docker-ubuntu.pkr.hcl] --> P[Packer]
     P --> D[Temporary Ubuntu container]
     D --> S[Shell provisioner]

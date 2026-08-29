@@ -28,7 +28,7 @@ This repository contains three progressive learning tracks:
 The complete artifact lifecycle is:
 
 ```mermaid
-flowchart LR
+flowchart TB
     PR[Pull request] --> V[Packer, shell, and Terraform validation]
     V --> M[Manual AMI workflow]
     M --> E[Protected aws-build environment]
@@ -99,7 +99,7 @@ Pull requests validate Packer formatting and configuration, Terraform configurat
 Packer loads all `*.pkr.hcl` files in the selected directory as one template. The AWS files therefore form one pipeline rather than four independent programs:
 
 ```mermaid
-flowchart LR
+flowchart TB
     V[versions.pkr.hcl] --> I[packer init]
     X[variables.pkr.hcl] --> Validate[packer validate]
     S[sources.pkr.hcl] --> Build[packer build]
