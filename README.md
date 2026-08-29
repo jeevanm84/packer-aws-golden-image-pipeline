@@ -135,6 +135,20 @@ Read [Code structure](docs/CODE_STRUCTURE.md) for the complete file-by-file map,
 - Run cleanup after every practice session.
 - This repository is an educational reference, not a drop-in organizational golden-image platform.
 
+## Portfolio roadmap
+
+This repository is the immutable-image stage of the [jeevanm84 engineering portfolio](https://github.com/jeevanm84):
+
+```text
+Git foundations → Terraform infrastructure → Packer images
+→ Kubernetes platform engineering → MJCart capstone
+```
+
+- Foundations: [Git Command Master Map](https://github.com/jeevanm84/git-command-master-map)
+- Infrastructure: [Terraform AWS HA Web Platform](https://github.com/jeevanm84/terraform-aws-ha-web-platform)
+- Next: [Kubernetes Zero to Production](https://github.com/jeevanm84/kubernetes-zero-to-production)
+- Capstone: [MJCart E-commerce Microservices](https://github.com/jeevanm84/mjcart-ecommerce-microservices)
+
 ## Contributing
 
 Issues and focused pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), follow the [Code of Conduct](CODE_OF_CONDUCT.md), and report security concerns through [SECURITY.md](SECURITY.md).
