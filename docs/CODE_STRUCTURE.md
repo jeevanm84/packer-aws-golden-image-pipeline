@@ -104,7 +104,7 @@ This path teaches the same source → provision → artifact → runtime-test lo
 ## AWS artifact flow
 
 ```mermaid
-flowchart LR
+flowchart TB
     Dispatch[Manual workflow dispatch] --> Gate[aws-build environment]
     Gate --> OIDC[Short-lived AWS credentials]
     OIDC --> Identity[Confirm account identity]
