@@ -34,7 +34,7 @@ jobs:
           version: 1.16.0
 
       - name: Configure temporary AWS credentials through OIDC
-        uses: aws-actions/configure-aws-credentials@v6.2.3
+        uses: aws-actions/configure-aws-credentials@v6.2.4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: packer-${{ github.run_id }}
